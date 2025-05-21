@@ -1,13 +1,9 @@
 const express = require("express");
-const puppeteer = require("puppeteer");
+const cors = require("cors");
 const puppeteer = require("puppeteer-core");
-const browser = await puppeteer.launch({
-  executablePath: "/usr/bin/chromium-browser", // Railway runtime
-  headless: true,
-  args: ["--no-sandbox", "--disable-setuid-sandbox"]
-});
 
 const app = express();
+app.use(cors());
 app.use(express.json());
 
 app.post("/scrape", async (req, res) => {
@@ -16,6 +12,7 @@ app.post("/scrape", async (req, res) => {
 
   try {
     const browser = await puppeteer.launch({
+      executablePath: "/usr/bin/chromium-browser", // Railway-compatible path
       headless: true,
       args: ["--no-sandbox", "--disable-setuid-sandbox"]
     });
@@ -32,11 +29,12 @@ app.post("/scrape", async (req, res) => {
           duration: cols[1]?.innerText.trim() || null,
           eligibility: cols[2]?.innerText.trim() || null
         };
-      }).filter(row => row.course); // remove header/empty rows
+      }).filter(row => row.course);
     });
 
     await browser.close();
     res.json({ success: true, data });
+
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
