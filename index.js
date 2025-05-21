@@ -44,3 +44,4 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Scraper server running on port ${PORT}`);
 });
+// Railway will automatically set the PORT environment variable
